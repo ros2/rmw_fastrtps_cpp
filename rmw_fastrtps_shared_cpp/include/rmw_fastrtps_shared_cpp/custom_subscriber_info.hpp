@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <limits>
 #include <mutex>
 #include <set>
 #include <utility>
@@ -54,13 +55,14 @@ struct CustomSubscriberInfo : public CustomEventInfo
 class SubListener : public EventListenerInterface, public eprosima::fastrtps::SubscriberListener
 {
 public:
-  explicit SubListener(CustomSubscriberInfo * info)
+  explicit SubListener(CustomSubscriberInfo * info, size_t qos_depth)
   : data_(0),
     deadline_changes_(false),
     liveliness_changes_(false),
     conditionMutex_(nullptr),
     conditionVariable_(nullptr)
   {
+    qos_depth_ = (qos_depth > 0) ? qos_depth : std::numeric_limits<size_t>::max();
     // Field is not used right now
     (void)info;
   }
@@ -178,7 +180,8 @@ public:
     if (callback) {
       // Push events arrived before setting the executor's callback
       if (new_data_unread_count_) {
-        callback(user_data, new_data_unread_count_);
+        auto unread_count = std::min(new_data_unread_count_, qos_depth_);
+        callback(user_data, unread_count);
         new_data_unread_count_ = 0;
       }
       user_data_ = user_data;
@@ -209,6 +212,7 @@ private:
 
   rmw_event_callback_t on_new_message_cb_{nullptr};
   std::mutex on_new_message_m_;
+  size_t qos_depth_;
   uint64_t new_data_unread_count_ = 0;
 };
 

@@ -163,7 +163,7 @@ create_subscription(
   }
 
   if (create_subscription_listener) {
-    info->listener_ = new (std::nothrow) SubListener(info);
+    info->listener_ = new (std::nothrow) SubListener(info, qos_policies->depth);
     if (!info->listener_) {
       RMW_SET_ERROR_MSG("create_subscriber() could not create subscriber listener");
       return nullptr;
