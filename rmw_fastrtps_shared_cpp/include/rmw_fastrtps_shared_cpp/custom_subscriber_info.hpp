@@ -84,13 +84,13 @@ public:
   void
   onNewDataMessage(eprosima::fastrtps::Subscriber * sub) final
   {
-    // Callback: add the subscription event to the event queue
-    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
+    update_unread_count(sub);
 
-    if(listener_callback_) {
-      listener_callback_(user_data_, 1);
+    std::unique_lock<std::mutex> lock_mutex(on_new_message_m_);
+
+    if(on_new_message_cb_) {
+      on_new_message_cb_(user_data_, 1);
     } else {
-      update_unread_count(sub);
       new_data_unread_count_++;
     }
   }
@@ -113,7 +113,7 @@ public:
   hasEvent(rmw_event_type_t event_type) const final;
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
-  void eventSetExecutorCallback(
+  void set_on_new_event_callback(
     const void * user_data,
     rmw_event_callback_t callback) final;
 
@@ -169,11 +169,11 @@ public:
   // Provide handlers to perform an action when a
   // new event from this listener has ocurred
   void
-  subcriptionSetExecutorCallback(
+  set_on_new_message_callback(
     const void * user_data,
     rmw_event_callback_t callback)
   {
-    std::unique_lock<std::mutex> lock_mutex(listener_callback_mutex_);
+    std::unique_lock<std::mutex> lock_mutex(on_new_message_m_);
 
     if (callback) {
       // Push events arrived before setting the executor's callback
@@ -182,10 +182,10 @@ public:
         new_data_unread_count_ = 0;
       }
       user_data_ = user_data;
-      listener_callback_ = callback;
+      on_new_message_cb_ = callback;
     } else {
       user_data_ = nullptr;
-      listener_callback_ = nullptr;
+      on_new_message_cb_ = nullptr;
     }
   }
 
@@ -207,6 +207,8 @@ private:
 
   std::set<eprosima::fastrtps::rtps::GUID_t> publishers_ RCPPUTILS_TSA_GUARDED_BY(internalMutex_);
 
+  rmw_event_callback_t on_new_message_cb_{nullptr};
+  std::mutex on_new_message_m_;
   uint64_t new_data_unread_count_ = 0;
 };
 
