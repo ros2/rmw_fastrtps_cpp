@@ -325,6 +325,7 @@ create_subscription(
   }
   rmw_subscription->options = *subscription_options;
   rmw_subscription->can_loan_messages = false;
+  rmw_subscription->is_cft_supported = false;
 
   topic.should_be_deleted = false;
   cleanup_rmw_subscription.cancel();
