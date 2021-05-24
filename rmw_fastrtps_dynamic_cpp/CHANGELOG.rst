@@ -2,6 +2,25 @@
 Changelog for package rmw_fastrtps_dynamic_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.0 (2021-05-12)
+------------------
+* Loan messages implementation (`#523 <https://github.com/ros2/rmw_fastrtps/issues/523>`_)
+  * Added is_plain\_ attribute to base TypeSupport.
+  * Added new methods to base TypeSupport.
+  * Implementation of rmw_borrow_loaned_message.
+  * Implementation of rmw_return_loaned_message_from_publisher.
+  * Enable loan messages on publishers of plain types.
+  * Implementation for taking loaned messages.
+  * Enable loan messages on subscriptions of plain types.
+* Contributors: Miguel Company
+
+5.0.0 (2021-04-06)
+------------------
+* Refactor to use DDS standard API (`#518 <https://github.com/ros2/rmw_fastrtps/issues/518>`_)
+* Unique network flows (`#502 <https://github.com/ros2/rmw_fastrtps/issues/502>`_)
+* updating quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#520 <https://github.com/ros2/rmw_fastrtps/issues/520>`_)
+* Contributors: Miguel Company, shonigmann
+
 4.5.0 (2021-03-18)
 ------------------
 

@@ -15,13 +15,16 @@
 #ifndef RMW_FASTRTPS_SHARED_CPP__TYPESUPPORT_HPP_
 #define RMW_FASTRTPS_SHARED_CPP__TYPESUPPORT_HPP_
 
-#include <fastrtps/Domain.h>
-#include <fastrtps/TopicDataType.h>
-
-#include <fastcdr/FastBuffer.h>
-#include <fastcdr/Cdr.h>
 #include <cassert>
 #include <string>
+
+#include "fastdds/dds/topic/TopicDataType.hpp"
+
+#include "fastdds/rtps/common/InstanceHandle.h"
+#include "fastdds/rtps/common/SerializedPayload.h"
+
+#include "fastcdr/FastBuffer.h"
+#include "fastcdr/Cdr.h"
 
 #include "rcutils/logging_macros.h"
 
@@ -38,7 +41,7 @@ struct SerializedData
   const void * impl;   // RMW implementation specific data
 };
 
-class TypeSupport : public eprosima::fastrtps::TopicDataType
+class TypeSupport : public eprosima::fastdds::dds::TopicDataType
 {
 public:
   virtual size_t getEstimatedSerializedSize(const void * ros_message, const void * impl) const = 0;
@@ -75,6 +78,24 @@ public:
   void deleteData(void * data) override;
 
   RMW_FASTRTPS_SHARED_CPP_PUBLIC
+  inline bool is_bounded() const
+#ifdef TOPIC_DATA_TYPE_API_HAS_IS_BOUNDED
+  override
+#endif
+  {
+    return max_size_bound_;
+  }
+
+  RMW_FASTRTPS_SHARED_CPP_PUBLIC
+  inline bool is_plain() const
+#ifdef TOPIC_DATA_TYPE_API_HAS_IS_PLAIN
+  override
+#endif
+  {
+    return is_plain_;
+  }
+
+  RMW_FASTRTPS_SHARED_CPP_PUBLIC
   virtual ~TypeSupport() {}
 
 protected:
@@ -82,17 +103,8 @@ protected:
   TypeSupport();
 
   bool max_size_bound_;
+  bool is_plain_;
 };
-
-inline void
-_unregister_type(
-  eprosima::fastrtps::Participant * participant,
-  TypeSupport * typed_typesupport)
-{
-  if (eprosima::fastrtps::Domain::unregisterType(participant, typed_typesupport->getName())) {
-    delete typed_typesupport;
-  }
-}
 
 }  // namespace rmw_fastrtps_shared_cpp
 
