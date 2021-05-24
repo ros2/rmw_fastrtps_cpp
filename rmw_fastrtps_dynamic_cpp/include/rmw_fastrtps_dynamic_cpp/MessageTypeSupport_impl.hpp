@@ -15,13 +15,13 @@
 #ifndef RMW_FASTRTPS_DYNAMIC_CPP__MESSAGETYPESUPPORT_IMPL_HPP_
 #define RMW_FASTRTPS_DYNAMIC_CPP__MESSAGETYPESUPPORT_IMPL_HPP_
 
-#include <fastcdr/FastBuffer.h>
-#include <fastcdr/Cdr.h>
-
 #include <cassert>
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include "fastcdr/FastBuffer.h"
+#include "fastcdr/Cdr.h"
 
 #include "rcpputils/find_and_replace.hpp"
 
@@ -50,8 +50,9 @@ MessageTypeSupport<MembersType>::MessageTypeSupport(
   ss << "dds_::" << message_name << "_";
   this->setName(ss.str().c_str());
 
-  // Fully bound by default
+  // Fully bound and plain by default
   this->max_size_bound_ = true;
+  this->is_plain_ = true;
   // Encapsulation size
   this->m_typeSize = 4;
   if (this->members_->member_count_ != 0) {
